@@ -8,8 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Entities.Courses;
 
-[Index("CourseId", Name = "IX_Lectures_CourseId")]
-[Index("ModuleId", Name = "IX_Lectures_ModuleId")]
+
 public partial class Lecture : AuditableEntity
 {
     #region Properties & Navigation
@@ -25,6 +24,7 @@ public partial class Lecture : AuditableEntity
     public Guid CourseId { get; private set; }
     public Course Course { get; private set; } = default!;
 
+    [ForeignKey("ZoomMeetingId")]
     public Guid ZoomMeetingId { get; set; }
     public ZoomMeeting ZoomMeeting { get; set; }
 

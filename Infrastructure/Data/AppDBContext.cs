@@ -32,7 +32,7 @@ public partial class AppDBContext : IdentityDbContext<ApplicationUser, IdentityR
 
     public virtual DbSet<Exam> Exams { get; set; }
 
-    public virtual DbSet<ExamQuestion> ExamQuestions { get; set; }
+    public virtual DbSet<ExamQuestions> ExamQuestions { get; set; }
 
     public virtual DbSet<ExamResult> ExamResults { get; set; }
 
@@ -57,84 +57,15 @@ public partial class AppDBContext : IdentityDbContext<ApplicationUser, IdentityR
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<AnswerOption>(entity =>
-        {
-            entity.Property(e => e.Id).ValueGeneratedNever();
-        });
+        modelBuilder.Entity<Lecture>()
+         .HasOne(l => l.ZoomMeeting)
+         .WithOne(z => z.Lecture)
+         .HasForeignKey<ZoomMeeting>(z => z.Id);
 
-      
-        modelBuilder.Entity<Course>(entity =>
-        {
-            entity.Property(e => e.Id).ValueGeneratedNever();
-        });
-
-        modelBuilder.Entity<Enrollment>(entity =>
-        {
-            entity.Property(e => e.Id).ValueGeneratedNever();
-
-            entity.HasOne(d => d.Course).WithMany(p => p.Enrollments).OnDelete(DeleteBehavior.ClientSetNull);
-
-            entity.HasOne(d => d.Student).WithMany(p => p.Enrollments).OnDelete(DeleteBehavior.ClientSetNull);
-        });
-
-        modelBuilder.Entity<Exam>(entity =>
-        {
-            entity.Property(e => e.Id).ValueGeneratedNever();
-        });
-
-        modelBuilder.Entity<ExamResult>(entity =>
-        {
-            entity.Property(e => e.Id).ValueGeneratedNever();
-
-            entity.HasOne(d => d.Exam).WithMany(p => p.ExamResults).OnDelete(DeleteBehavior.ClientSetNull);
-
-            entity.HasOne(d => d.Student).WithMany(p => p.ExamResults).OnDelete(DeleteBehavior.ClientSetNull);
-        });
-
-        modelBuilder.Entity<Instructor>(entity =>
-        {
-            entity.Property(e => e.Id).ValueGeneratedNever();
-        });
-
-        modelBuilder.Entity<Lecture>(entity =>
-        {
-            entity.Property(e => e.Id).ValueGeneratedNever();
-        });
-
-        modelBuilder.Entity<Module>(entity =>
-        {
-            entity.Property(e => e.Id).ValueGeneratedNever();
-        });
-
-        modelBuilder.Entity<Question>(entity =>
-        {
-            entity.Property(e => e.Id).ValueGeneratedNever();
-        });
-
-        modelBuilder.Entity<RefreshToken>(entity =>
-        {
-            entity.Property(e => e.Id).ValueGeneratedNever();
-        });
-
-        modelBuilder.Entity<Student>(entity =>
-        {
-            entity.Property(e => e.Id).ValueGeneratedNever();
-        });
-
-        modelBuilder.Entity<StudentAnswer>(entity =>
-        {
-            entity.Property(e => e.Id).ValueGeneratedNever();
-        });
-
-        modelBuilder.Entity<ZoomMeeting>(entity =>
-        {
-            entity.Property(e => e.Id).ValueGeneratedNever();
-        });
-
-        modelBuilder.Entity<ZoomRecording>(entity =>
-        {
-            entity.Property(e => e.Id).ValueGeneratedNever();
-        });
+        modelBuilder.Entity<Lecture>()
+        .HasOne(l => l.ZoomRecording)
+        .WithOne(z => z.Lecture)
+        .HasForeignKey<ZoomRecording>(z => z.Id);
 
         OnModelCreatingPartial(modelBuilder);
     }

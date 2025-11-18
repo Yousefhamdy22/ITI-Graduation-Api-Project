@@ -9,23 +9,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Entities.Exams;
 
-[Index("QuestionId", Name = "IX_AnswerOptions_QuestionId")]
 public partial class AnswerOption : AuditableEntity
 {
-    [Key]
-    public Guid Id { get; set; }
+    #region Properties
+    public string Text { get; private set; } = default!;
+    public bool IsCorrect { get; private set; }
+    #endregion
 
-    public string Text { get; set; } = null!;
-
-    public bool IsCorrect { get; set; }
-
-    public Guid QuestionId { get; set; }
-
-
-    [ForeignKey("QuestionId")]
-    [InverseProperty("AnswerOptions")]
-    public virtual Question Question { get; set; } = null!;
-
-    [InverseProperty("SelectedAnswer")]
-    public virtual ICollection<StudentAnswer> StudentAnswers { get; set; } = new List<StudentAnswer>();
+    #region Foreign Keys
+    public Guid QuestionId { get; private set; }
+    public Question Question { get; private set; } = default!;
+    #endregion
 }
