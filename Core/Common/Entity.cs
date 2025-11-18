@@ -10,9 +10,11 @@ namespace Core.Common
 
     public abstract class Entity
     {
-        public Guid Id { get; }
+        // Make Id settable (protected) so Entity Framework can map it and constructors can assign it
+        public Guid Id { get; protected set; }
 
-        private readonly List<DomainEvent> _domainEvents = [];
+        // Initialize the domain events list correctly
+        private readonly List<DomainEvent> _domainEvents = new List<DomainEvent>();
 
         [NotMapped]
         public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents.AsReadOnly();

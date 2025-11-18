@@ -57,6 +57,9 @@ public partial class AppDBContext : IdentityDbContext<ApplicationUser, IdentityR
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Important: let IdentityDbContext configure its own entities (roles, user logins, etc.)
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<Lecture>()
          .HasOne(l => l.ZoomMeeting)
          .WithOne(z => z.Lecture)
@@ -66,6 +69,24 @@ public partial class AppDBContext : IdentityDbContext<ApplicationUser, IdentityR
         .HasOne(l => l.ZoomRecording)
         .WithOne(z => z.Lecture)
         .HasForeignKey<ZoomRecording>(z => z.Id);
+
+        // Configure ExamQuestions as a join entity with composite key
+        modelBuilder.Entity<ExamQuestions>(entity =>
+        {
+            entity.HasKey(eq => new { eq.ExamId, eq.QuestionId });
+
+            entity.HasOne(eq => eq.Exam)
+                  .WithMany(e => e.ExamQuestions)
+                  .HasForeignKey(eq => eq.ExamId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(eq => eq.Question)
+                  .WithMany(q => q.ExamQuestions)
+                  .HasForeignKey(eq => eq.QuestionId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            // Optional: configure property length/order, etc.
+        });
 
         OnModelCreatingPartial(modelBuilder);
     }
