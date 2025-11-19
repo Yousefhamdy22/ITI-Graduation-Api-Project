@@ -144,8 +144,6 @@ public class TokenService : ITokenService
         return true;
     }
 
-
-   
     public async Task<ApplicationUser> GetUserFromTokenAsync(string token)
     {
         if (string.IsNullOrWhiteSpace(token))
