@@ -12,9 +12,10 @@ public class GetCourseByIdQueryHandler : IRequestHandler<GetCourseByIdQuery, Cou
     private readonly IGenericRepository<Course> _courseRepository;
     private readonly IMapper _mapper;
 
-    public GetCourseByIdQueryHandler(IGenericRepository<Course> courseRepository, IMapper _mapper)
+    public GetCourseByIdQueryHandler(IGenericRepository<Course> courseRepository, IMapper mapper)
     {
         _courseRepository = courseRepository;
+        _mapper = mapper;
     }
 
     public async Task<CourseDto> Handle(GetCourseByIdQuery request, CancellationToken cancellationToken)
@@ -22,6 +23,6 @@ public class GetCourseByIdQueryHandler : IRequestHandler<GetCourseByIdQuery, Cou
         var course = await _courseRepository.GetByIdAsync(request.id);
         if (course == null)
             throw new BusinessException("Course is Null");
-        return await _mapper.Map<Task<CourseDto>>(course);
+        return _mapper.Map<CourseDto>(course);
     }
 }
