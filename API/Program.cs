@@ -7,51 +7,60 @@ using API.Handlers;
 using Core.Interfaces;
 using Infrastructure.Common;
 using Microsoft.AspNetCore.Identity;
+using Infrastructure.Interface;
+using Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DataBase");
 builder.Services.AddDbContext<AppDBContext>(options =>
 {
-    options.UseSqlServer(connectionString,b => b.MigrationsAssembly(typeof(AppDBContext).Assembly.FullName));
+ options.UseSqlServer(connectionString,b => b.MigrationsAssembly(typeof(AppDBContext).Assembly.FullName));
 });
 
 builder.Services.AddIdentityApiEndpoints<IdentityUser<Guid>>()
-    .AddRoles<IdentityRole<Guid>>()
-    .AddEntityFrameworkStores<AppDBContext>()
-    .AddDefaultTokenProviders();
+ .AddRoles<IdentityRole<Guid>>()
+ .AddEntityFrameworkStores<AppDBContext>()
+ .AddDefaultTokenProviders();
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+// register repositories
+builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<IExamResultRepository, ExamResultRepository>();
+builder.Services.AddScoped<IAnswerOptionRepository, AnswerOptionRepository>();
+builder.Services.AddScoped<IStudentAnswerRepository, StudentAnswerRepository>();
 
 // Replace AddOpenApi() with AddSwaggerGen and an OpenAPI document
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "RepositoryPattern UnitOfWork API",
-        Version = "v1",
-        Description = "API documentation for RepositoryPattern_UnitOfWork"
-    });
+ c.SwaggerDoc("v1", new OpenApiInfo
+ {
+ Title = "RepositoryPattern UnitOfWork API",
+ Version = "v1",
+ Description = "API documentation for RepositoryPattern_UnitOfWork"
+ });
 });
 
 builder.Services.AddControllers(options =>
-    {
-        // يمكنك إضافة خيارات أخرى هنا
-    })
-    .ConfigureApiBehaviorOptions(options =>
-    {
-        // 💥 الخطوة الحاسمة: تعطيل معالجة ModelState غير الصالح تلقائياً.
-        // هذا يسمح لـ FluentValidation (من خلال Pipeline Behavior) بإطلاق ValidationException،
-        // الذي سيلتقطه الـ ValidationExceptionHandler.
-        options.SuppressModelStateInvalidFilter = true;
-    })
-    .AddFluentValidation(fv =>
-    {
-        // تسجيل كل الـ Validators في Assembly الذي يحتوي على الكلاس Program
-        fv.RegisterValidatorsFromAssemblyContaining<Program>();
-        // تعطيل التحقق من صحة Data Annotations (للاحتفاظ بـ FluentValidation فقط)
-        fv.DisableDataAnnotationsValidation = true;
-    });
+ {
+ // يمكنك إضافة خيارات أخرى هنا
+ })
+ .ConfigureApiBehaviorOptions(options =>
+ {
+ // 💥 الخطوة الحاسمة: تعطيل معالجة ModelState غير الصالح تلقائياً.
+ // هذا يسمح لـ FluentValidation (من خلال Pipeline Behavior) بإطلاق ValidationException،
+ // الذي سيلتقطه الـ ValidationExceptionHandler.
+ options.SuppressModelStateInvalidFilter = true;
+ })
+ .AddFluentValidation(fv =>
+ {
+ // تسجيل كل الـ Validators في Assembly الذي يحتوي على الكلاس Program
+ fv.RegisterValidatorsFromAssemblyContaining<Program>();
+ // تعطيل التحقق من صحة Data Annotations (للاحتفاظ بـ FluentValidation فقط)
+ fv.DisableDataAnnotationsValidation = true;
+ });
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -62,7 +71,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "RepositoryPattern UnitOfWork API v1");
+ c.SwaggerEndpoint("/swagger/v1/swagger.json", "RepositoryPattern UnitOfWork API v1");
 });
 app.UseExceptionHandler();
 

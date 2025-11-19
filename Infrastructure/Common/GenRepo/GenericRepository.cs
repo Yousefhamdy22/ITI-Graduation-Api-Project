@@ -2,7 +2,11 @@ using System.Linq.Expressions;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Core.Interfaces;
-using Core.Entities;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System;
+using Core.Entities.Students;
 
 namespace Infrastructure.Common.GenRepo;
 
@@ -13,193 +17,199 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     public GenericRepository(AppDBContext context)
     {
         _context = context;
-    }
+    }   
+
     public IEnumerable<T> GetAll()
+    {
+        return _context.Set<T>().ToList();
+    }
+
+    public async Task<IEnumerable<T>> GetAllAsync(CancellationToken ct = default)
+    {
+        return await _context.Set<T>().ToListAsync(ct);
+    }
+
+    public T? GetById(Guid id)
+    {
+        return _context.Set<T>().Find(id);
+    }
+
+    public async Task<T?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        return await _context.Set<T>().FindAsync(new object[] { id }, ct);
+    }
+
+    public T? Find(Expression<Func<T, bool>> criteria, string[]? includes = null)
+    {
+        IQueryable<T> query = _context.Set<T>();
+
+        if (includes != null)
+            foreach (var include in includes)
+                query = query.Include(include);
+
+        return query.SingleOrDefault(criteria);
+    }
+
+    public async Task<T?> FindAsync(Expression<Func<T, bool>> criteria, string[]? includes = null, CancellationToken ct = default)
+    {
+        IQueryable<T> query = _context.Set<T>();
+
+        if (includes != null)
+            foreach (var include in includes)
+                query = query.Include(include);
+
+        return await query.SingleOrDefaultAsync(criteria, ct);
+    }
+
+    public IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, string[]? includes = null)
+    {
+        IQueryable<T> query = _context.Set<T>();
+
+        if (includes != null)
+            foreach (var include in includes)
+                query = query.Include(include);
+
+        return query.Where(criteria).ToList();
+    }
+
+    public IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, int skip, int take)
+    {
+        return _context.Set<T>().Where(criteria).Skip(skip).Take(take).ToList();
+    }
+
+    public IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, int? skip, int? take,
+        Expression<Func<T, object>>? orderBy = null, string orderByDirection = "ASC")
+    {
+        IQueryable<T> query = _context.Set<T>().Where(criteria);
+
+        if (skip.HasValue)
+            query = query.Skip(skip.Value);
+
+        if (take.HasValue)
+            query = query.Take(take.Value);
+
+        if (orderBy != null)
         {
-            return _context.Set<T>().ToList();
+            if (orderByDirection == "ASC")
+                query = query.OrderBy(orderBy);
+            else
+                query = query.OrderByDescending(orderBy);
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        return query.ToList();
+    }
+
+    public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, CancellationToken ct = default)
+    {
+        IQueryable<T> query = _context.Set<T>().Where(criteria);
+        return await query.ToListAsync(ct);
+    }
+
+    public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, int skip, int take, CancellationToken ct = default)
+    {
+        return await _context.Set<T>().Where(criteria).Skip(skip).Take(take).ToListAsync(ct);
+    }
+
+    public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, int? skip, int? take,
+        Expression<Func<T, object>>? orderBy = null, string orderByDirection = "ASC", CancellationToken ct = default)
+    {
+        IQueryable<T> query = _context.Set<T>().Where(criteria);
+
+        if (take.HasValue)
+            query = query.Take(take.Value);
+
+        if (skip.HasValue)
+            query = query.Skip(skip.Value);
+
+        if (orderBy != null)
         {
-            return await _context.Set<T>().ToListAsync();
+            if (orderByDirection == "ASC")
+                query = query.OrderBy(orderBy);
+            else
+                query = query.OrderByDescending(orderBy);
         }
 
-        public T GetById(int id)
-        {
-            return _context.Set<T>().Find(id);
-        }
+        return await query.ToListAsync(ct);
+    }
 
-        public async Task<T> GetByIdAsync(int id)
-        {
-            return await _context.Set<T>().FindAsync(id);
-        }
+    public T Add(T entity)
+    {
+        _context.Set<T>().Add(entity);
+        return entity;
+    }
 
-        public T Find(Expression<Func<T, bool>> criteria, string[] includes = null)
-        {
-            IQueryable<T> query = _context.Set<T>();
+    public async Task<T> AddAsync(T entity, CancellationToken ct = default)
+    {
+        await _context.Set<T>().AddAsync(entity, ct);
+        return entity;
+    }
 
-            if (includes != null)
-                foreach (var incluse in includes)
-                    query = query.Include(incluse);
+    public IEnumerable<T> AddRange(IEnumerable<T> entities)
+    {
+        _context.Set<T>().AddRange(entities);
+        return entities;
+    }
 
-            return query.SingleOrDefault(criteria);
-        }
+    public async Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities, CancellationToken ct = default)
+    {
+        await _context.Set<T>().AddRangeAsync(entities, ct);
+        return entities;
+    }
 
-        public async Task<T> FindAsync(Expression<Func<T, bool>> criteria, string[] includes = null)
-        {
-            IQueryable<T> query = _context.Set<T>();
+    public T Update(T entity)
+    {
+        _context.Update(entity);
+        return entity;
+    }
 
-            if (includes != null)
-                foreach (var incluse in includes)
-                    query = query.Include(incluse);
+    public async Task UpdateAsync(T entity, CancellationToken ct = default)
+    {
+        _context.Update(entity);
+        await Task.CompletedTask;
+    }
 
-            return await query.SingleOrDefaultAsync(criteria);
-        }
+    public void Delete(T entity)
+    {
+        _context.Set<T>().Remove(entity);
+    }
 
-        public IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, string[] includes = null)
-        {
-            IQueryable<T> query = _context.Set<T>();
+    public void DeleteRange(IEnumerable<T> entities)
+    {
+        _context.Set<T>().RemoveRange(entities);
+    }
 
-            if (includes != null)
-                foreach (var include in includes)
-                    query = query.Include(include);
+    public void Attach(T entity)
+    {
+        _context.Set<T>().Attach(entity);
+    }
 
-            return query.Where(criteria).ToList();
-        }
+    public void AttachRange(IEnumerable<T> entities)
+    {
+        _context.Set<T>().AttachRange(entities);
+    }
 
-        public IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, int skip, int take)
-        {
-            return _context.Set<T>().Where(criteria).Skip(skip).Take(take).ToList();
-        }
+    public int Count()
+    {
+        return _context.Set<T>().Count();
+    }
 
-        public IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, int? skip, int? take,
-            Expression<Func<T, object>> orderBy = null, string orderByDirection ="ASC")
-        {
-            IQueryable<T> query = _context.Set<T>().Where(criteria);
+    public int Count(Expression<Func<T, bool>> criteria)
+    {
+        return _context.Set<T>().Count(criteria);
+    }
 
-            if (skip.HasValue)
-                query = query.Skip(skip.Value);
+    public async Task<int> CountAsync(CancellationToken ct = default)
+    {
+        return await _context.Set<T>().CountAsync(ct);
+    }
 
-            if (take.HasValue)
-                query = query.Take(take.Value);
+    public async Task<int> CountAsync(Expression<Func<T, bool>> criteria, CancellationToken ct = default)
+    {
+        return await _context.Set<T>().CountAsync(criteria, ct);
+    }
 
-            if(orderBy != null)
-            {
-                if(orderByDirection == "ASC")
-                    query = query.OrderBy(orderBy);
-                else
-                    query = query.OrderByDescending(orderBy);
-            }
-
-            return query.ToList();
-        }
-
-        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, string[] includes = null)
-        {
-            IQueryable<T> query = _context.Set<T>();
-
-            if (includes != null)
-                foreach (var include in includes)
-                    query = query.Include(include);
-
-            return await query.Where(criteria).ToListAsync();
-        }
-
-        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, int take, int skip)
-        {
-            return await _context.Set<T>().Where(criteria).Skip(skip).Take(take).ToListAsync();
-        }
-
-        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, int? take, int? skip,
-            Expression<Func<T, object>> orderBy = null, string orderByDirection = "ASC")
-        {
-            IQueryable<T> query = _context.Set<T>().Where(criteria);
-
-            if (take.HasValue)
-                query = query.Take(take.Value);
-
-            if (skip.HasValue)
-                query = query.Skip(skip.Value);
-
-            if (orderBy != null)
-            {
-                if (orderByDirection == "ASC")
-                    query = query.OrderBy(orderBy);
-                else
-                    query = query.OrderByDescending(orderBy);
-            }
-
-            return await query.ToListAsync();
-        }
-
-        public T Add(T entity)
-        {
-            _context.Set<T>().Add(entity);
-            return entity;
-        }
-
-        public async Task<T> AddAsync(T entity)
-        {
-            await _context.Set<T>().AddAsync(entity);
-            return entity;
-        }
-
-        public IEnumerable<T> AddRange(IEnumerable<T> entities)
-        {
-            _context.Set<T>().AddRange(entities);
-            return entities;
-        }
-
-        public async Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities)
-        {
-            await _context.Set<T>().AddRangeAsync(entities);
-            return entities;
-        }
-
-        public T Update(T entity)
-        {
-            _context.Update(entity);
-            return entity;
-        }
-
-        public void Delete(T entity)
-        {
-            _context.Set<T>().Remove(entity);
-        }
-
-        public void DeleteRange(IEnumerable<T> entities)
-        {
-            _context.Set<T>().RemoveRange(entities);
-        }
-
-        public void Attach(T entity)
-        {
-            _context.Set<T>().Attach(entity);
-        }
-
-        public void AttachRange(IEnumerable<T> entities)
-        {
-            _context.Set<T>().AttachRange(entities);
-        }
-
-        public int Count()
-        {
-            return _context.Set<T>().Count();
-        }
-
-        public int Count(Expression<Func<T, bool>> criteria)
-        {
-            return _context.Set<T>().Count(criteria);
-        }
-
-        public async Task<int> CountAsync()
-        {
-            return await _context.Set<T>().CountAsync();
-        }
-
-        public async Task<int> CountAsync(Expression<Func<T, bool>> criteria)
-        {
-            return await _context.Set<T>().CountAsync(criteria);
-        }
-
+    Task IGenericRepository<T>.DeleteAsync(Student student, CancellationToken ct)
+    {
+        throw new NotImplementedException();
+    }
 }

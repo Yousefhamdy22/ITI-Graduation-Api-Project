@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using Enrollment = Core.Entities.Courses.Enrollment;
 
 namespace Infrastructure.Data;
 

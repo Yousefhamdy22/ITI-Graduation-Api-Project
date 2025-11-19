@@ -36,4 +36,35 @@ public partial class ExamResult : AuditableEntity
 
 
     #endregion
+
+    public void EvaluateAnswer(bool isCorrect)
+    {
+        TotalQuestions++;
+        if (isCorrect)
+        {
+            CorrectAnswers++;
+        }
+        else
+        {
+            WrongAnswers++;
+        }
+
+        // recompute score as percentage
+        if (TotalQuestions >0)
+        {
+            Score = (double)CorrectAnswers / TotalQuestions *100.0;
+        }
+    }
+
+    public void Submit()
+    {
+        SubmittedAt = DateTimeOffset.UtcNow;
+        Status = "Submitted";
+    }
+
+    public void Start()
+    {
+        StartedAt = DateTimeOffset.UtcNow;
+        Status = "InProgress";
+    }
 }

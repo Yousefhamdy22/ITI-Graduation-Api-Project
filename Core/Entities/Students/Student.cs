@@ -13,6 +13,8 @@ namespace Core.Entities.Students;
 
 public partial class Student : AuditableEntity
 {
+    public readonly string Gender;
+
     [ForeignKey("User")]
     public Guid UserId { get; private set; }
 
@@ -25,4 +27,13 @@ public partial class Student : AuditableEntity
     public ICollection<Enrollment> Enrollments { get; private set; } = new List<Enrollment>();
     public ICollection<ExamResult> ExamResults { get; private set; } = new List<ExamResult>();
 
+    public static object Create(Guid userId, string gender)
+    {
+        throw new NotImplementedException();
+    }
+
+    public object Update(string gender)
+    {
+        throw new NotImplementedException();
+    }
 }
