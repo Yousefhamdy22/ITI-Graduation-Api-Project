@@ -17,7 +17,16 @@ namespace Infrastructure.Helper
         public bool ValidateAudience { get; set; }
         public bool ValidateIssuerSigningKey { get; set; }
 
-
-
     }
+
+    public class AuthResult
+    {
+    public string Token { get; set; }
+    public string RefreshToken { get; set; }
+    public string SessionId { get; set; }
+    public DateTime ExpiresAt { get; set; }
+    public bool IsSuccess { get; set; }
+    public List<string> Errors { get; set; }
+  }
+
 }
