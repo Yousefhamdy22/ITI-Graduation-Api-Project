@@ -33,17 +33,16 @@ public class CourseController : ControllerBase
     }
 
     [HttpPost("Create")]
-    public async Task<IActionResult> CreateCourse(CreateCourseCommand commandourse)
+    public async Task<IActionResult> CreateCourse(CreateCourseCommand command)
     {
-        var result = await _mediator.Send(commandourse);
+        var result = await _mediator.Send(command);
         return Ok(result);
     }
 
     [HttpPost("Update/{id:guid}", Name = "UpdateCourse")]
     public async Task<IActionResult> UpdateCourse(Guid id, [FromBody] CourseDto.UpdateCourseDto dto)
     {
-        var command = _mapper.Map<UpdateCourseCommand>(dto);
-
+        var command = new UpdateCourseCommand(dto);
         var result = await _mediator.Send(command);
 
         return Ok(result);
