@@ -1,6 +1,4 @@
 using Core.Entities.Identity;
-using Infrastructure.Interfaces;
-
 
 public interface IRefreshTokenRepository
 {
