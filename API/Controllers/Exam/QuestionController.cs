@@ -59,40 +59,10 @@ public class QuestionController : ControllerBase
     {
         if (dto == null)
             return Result.NotFound("Question Data cannot be null");
-        if (image != null)
-        {
-            _logger.LogInformation("Update called with image: {FileName}", image.FileName);
 
-            // If DTO doesn't contain the existing ImageUrl, fetch it from DB so DeleteFileAsync can remove the old file
-            var existingPath = dto.ImageUrl;
-            if (string.IsNullOrEmpty(existingPath))
-                try
-                {
-                    var q = await _unitOfWork.Questions.GetByIdAsync(dto.Id);
-                    existingPath = q?.ImageUrl;
-                    _logger.LogInformation("Fetched existing ImageUrl from DB: {ExistingPath}", existingPath);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Failed to fetch existing question to determine old ImageUrl");
-                }
-
-            dto.ImageUrl =
-                await _fileStorageService.UpdateFileAsync(existingPath, image.FileName, image.OpenReadStream(),
-                    "Questions");
-            _logger.LogInformation("FileStorage returned ImageUrl: {ImageUrl}", dto.ImageUrl);
-        }
-        else
-        {
-            _logger.LogInformation("Update called without an image. Keeping existing ImageUrl: {ImageUrl}",
-                dto.ImageUrl);
-        }
-
-        _logger.LogInformation("Uploaded image saved: {ImageUrl}", dto.ImageUrl);
-
-
-        return await _sender.Send(new UpdateQuestionCommand(dto));
+        return await _sender.Send(new UpdateQuestionCommand(dto, image));
     }
+
 
     [HttpGet("GetAllQuestions")]
     [TranslateResultToActionResult]
