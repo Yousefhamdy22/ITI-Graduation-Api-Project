@@ -4,21 +4,30 @@ using Application;
 using Application.Features.Courses.Commands.CreateCourse;
 using Application.Features.Courses.Mappers;
 using Core.Interfaces;
+using Core.Interfaces.Services;
+
+
+using Core.Interfaces.Services;
+
 using Infrastructure;
 using Infrastructure.Common;
 using Infrastructure.Common.GenRepo;
 using Infrastructure.Data;
 using Infrastructure.Extension;
-using Microsoft.AspNetCore.Identity;
+using Infrastructure.services;
+using Infrastructure.Services;
+
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+//builder.WebHost.UseWebRoot("wwwroot");
 
 var connectionString = builder.Configuration.GetConnectionString("DataBase");
 
 builder.Services.AddInfrastructureDependencies().AddServiceDependencies()
-           .AddServiceRegisteration(builder.Configuration);
+    .AddServiceRegisteration(builder.Configuration);
 
 builder.Services.AddDbContext<AppDBContext>(options =>
 {
@@ -28,8 +37,13 @@ builder.Services.AddDbContext<AppDBContext>(options =>
 });
 
 
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
 builder.Services.AddMediatR(cfg =>
@@ -37,7 +51,7 @@ builder.Services.AddMediatR(cfg =>
 
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(CourseProfile).Assembly));
 
-// Replace AddOpenApi() with AddSwaggerGen and an OpenAPI document
+
 #region Swagger Config
 
 builder.Services.AddEndpointsApiExplorer();
@@ -61,47 +75,45 @@ builder.Services.AddSwaggerGen(c =>
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
                 {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        new string[] {}
-                    }
-                });
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] { }
+        }
+    });
 
 
     try
     {
         var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
         var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-        if (File.Exists(xmlPath))
-        {
-            c.IncludeXmlComments(xmlPath);
-        }
+        if (File.Exists(xmlPath)) c.IncludeXmlComments(xmlPath);
     }
     catch
     {
         // Ignore if XML comments aren't available
     }
 });
+
 #endregion
 
 
-
 builder.Services.AddControllers();
+// builder.Services.AddResultExceptionHandler();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 var app = builder.Build();
-
+app.UseStaticFiles();
 
 
 using (var scope = app.Services.CreateScope())
@@ -109,7 +121,9 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     await services.SeedRolesAsync();
 }
+
 #region Swagger Middleware
+
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -118,10 +132,7 @@ app.UseSwaggerUI(c =>
 
     // For production, you might want to hide the Swagger UI
     // but keep the JSON available for API consumers
-    if (!app.Environment.IsDevelopment())
-    {
-        c.DocumentTitle = "API Documentation - Production";
-    }
+    if (!app.Environment.IsDevelopment()) c.DocumentTitle = "API Documentation - Production";
 });
 
 #endregion
@@ -132,29 +143,21 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     await services.SeedRolesAsync();
 }
+
 #region Swagger Middleware
+
 app.UseSwagger();
-// <<<<<<< HEAD
-// app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "RepositoryPattern UnitOfWork API v1"); });
-// // app.UseExceptionHandler();
-// app.UseSwaggerUI();
-// =======
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "E-Learning API V1");
     c.RoutePrefix = "swagger"; // This makes it available at /swagger
 
-    // For production, you might want to hide the Swagger UI
-    // but keep the JSON available for API consumers
-    if (!app.Environment.IsDevelopment())
-    {
-        c.DocumentTitle = "API Documentation - Production";
-    }
+    if (!app.Environment.IsDevelopment()) c.DocumentTitle = "API Documentation - Production";
 });
 
 #endregion
 
-// app.UseExceptionHandler();
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 

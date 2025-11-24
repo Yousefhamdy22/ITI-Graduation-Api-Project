@@ -1,30 +1,29 @@
-﻿using Core.Entities.Identity;
+﻿using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
+using Core.DTOs;
+using Core.Entities.Identity;
 using Infrastructure.Data;
-using Infrastructure.Helper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.Text;
-using System.Text.Json;
 
+namespace Infrastructure;
 
-namespace Infrastructure
+public static class ServicesOfRegisteration
 {
-    public static class ServicesOfRegisteration
+    public static IServiceCollection AddServiceRegisteration(this IServiceCollection services,
+        IConfiguration configuration)
     {
-        public static IServiceCollection AddServiceRegisteration(this IServiceCollection services,
-                                                                      IConfiguration configuration)
-        {
-            var jwtSettings = new JwtSettings();
-            configuration.Bind("jwtSettings", jwtSettings);
-            services.AddSingleton(jwtSettings);
+        var jwtSettings = new JwtSettings();
+        configuration.Bind("jwtSettings", jwtSettings);
+        services.AddSingleton(jwtSettings);
 
-            // Identity setup
-            services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+        // Identity setup
+        services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
             {
                 options.Password.RequireDigit = false;
                 options.Password.RequireLowercase = false;
@@ -40,7 +39,7 @@ namespace Infrastructure
 
                 // User settings
                 options.User.AllowedUserNameCharacters
-                = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
 
                 options.User.RequireUniqueEmail = true;
                 options.SignIn.RequireConfirmedEmail = true;
@@ -48,8 +47,8 @@ namespace Infrastructure
             .AddEntityFrameworkStores<AppDBContext>()
             .AddDefaultTokenProviders();
 
-            //JWT Authentication setup
-            services.AddAuthentication(options =>
+        //JWT Authentication setup
+        services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; //sechma
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -60,7 +59,6 @@ namespace Infrastructure
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    
                     ValidIssuer = jwtSettings.Issuer,
                     ValidateAudience = jwtSettings.ValidateAudience,
                     ValidAudience = jwtSettings.Audience,
@@ -136,8 +134,6 @@ namespace Infrastructure
             });
 
 
-            return services;
-        }
+        return services;
     }
 }
-

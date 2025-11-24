@@ -2,8 +2,8 @@
 using Application.Features.Authantication.Dtos;
 using Core.Common.Results;
 using Core.Entities.Identity;
+using Core.Interfaces.Services;
 using FluentValidation;
-using Infrastructure.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
