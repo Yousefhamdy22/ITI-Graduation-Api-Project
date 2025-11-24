@@ -1,5 +1,5 @@
 using Core.Entities.Identity;
-using Infrastructure.Interfaces;
+using Core.Interfaces;
 
 
 public interface IRefreshTokenRepository

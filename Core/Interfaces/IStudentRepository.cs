@@ -1,6 +1,6 @@
 ﻿using Core.Entities.Students;
 using Core.Interfaces;
-using Infrastructure.Common.GenRepo;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

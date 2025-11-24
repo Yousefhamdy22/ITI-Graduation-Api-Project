@@ -16,7 +16,5 @@ namespace Infrastructure.Interfaces
 
 
 
-
-
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Helper
@@ -27,6 +28,29 @@ namespace Infrastructure.Helper
     public DateTime ExpiresAt { get; set; }
     public bool IsSuccess { get; set; }
     public List<string> Errors { get; set; }
-  }
+    }
+    public class ZoomSettings
+    {
+        [JsonPropertyName("AccountId")]
+        public string AccountId { get; set; } = string.Empty;
+
+        [JsonPropertyName("ClientId")]
+        public string ClientId { get; set; } = string.Empty;
+
+        [JsonPropertyName("ClientSecret")]
+        public string ClientSecret { get; set; } = string.Empty;
+
+        [JsonPropertyName("BaseUrl")]
+        public string BaseUrl { get; set; } = "https://api.zoom.us/v2";
+
+        [JsonPropertyName("WebhookSecret")]
+        public string WebhookSecret { get; set; } = string.Empty;
+
+        [JsonPropertyName("DefaultUserId")]
+        public string? DefaultUserId { get; set; }
+
+        [JsonPropertyName("DefaultTimezone")]
+        public string DefaultTimezone { get; set; } = "UTC";
+    }
 
 }

@@ -21,7 +21,7 @@ public partial class Lecture : AuditableEntity
     public bool IsCompleted { get; private set; } = false;
 
     // Foreign Key
-    public Guid CourseId { get; private set; }
+    public Guid? CourseId { get; private set; }
     public Course Course { get; private set; } = default!;
 
     [ForeignKey("ZoomMeetingId")]

@@ -22,10 +22,15 @@
       </PackageReference>
       <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="9.3.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Core\Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="ZoomServices\ZoomWebhookService\" />
     </ItemGroup>
 
 </Project>
