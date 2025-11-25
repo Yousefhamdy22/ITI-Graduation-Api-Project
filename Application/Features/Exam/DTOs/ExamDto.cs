@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Application.Features.Students.DTOs;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Application.Features.Exam.DTOs;
-
 
 public class ExamDto
 {
@@ -16,6 +19,29 @@ public class ExamDto
     public List<QuestionDto> Questions { get; set; } = new();
 }
 
+public class CreateQuestionRequestDto
+{
+    public string Text { get; set; } = default!;
+    public decimal Points { get; set; }
+    public IFormFile? Image { get; set; }
+
+    [JsonIgnore] 
+    public string? ImageUrl { get; set; }
+
+    // نرسلها كسلسلة JSON
+    public string? AnswerOptionsJson { get; set; }
+
+    // تتحول تلقائيًا إلى List
+    [JsonIgnore]                 // يمنع الـ JSON binding
+    [System.Text.Json.Serialization.JsonIgnore]
+    [SwaggerSchema(ReadOnly = true)]  // يمنعه من الظهور في Swagger
+    [NotMapped]
+    public List<AnswerOptionDto> AnswerOptions =>
+        string.IsNullOrEmpty(AnswerOptionsJson)
+            ? new List<AnswerOptionDto>()
+            : JsonConvert.DeserializeObject<List<AnswerOptionDto>>(AnswerOptionsJson)!;
+}
+
 public class QuestionDto
 {
     public Guid Id { get; set; }
@@ -26,7 +52,8 @@ public class QuestionDto
     //public int Order { get; set; } = default!;
     public string? ImageUrl { get; set; }
 
-    public List<AnswerOptionDto> Answers { get; set; } = new();
+
+    public List<AnswerOptionDto> AnswerOptions { get; set; } = new();
 }
 
 public class AnswerOptionDto
