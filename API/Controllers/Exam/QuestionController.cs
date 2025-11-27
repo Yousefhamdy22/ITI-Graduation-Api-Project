@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Application.Features.Exam.Commands.Questions.CreateQuestion;
 using Application.Features.Exam.Commands.Questions.RemoveQuestion;
 using Application.Features.Exam.Commands.Questions.UpdateQuestion;
@@ -23,13 +22,10 @@ public class QuestionController : ControllerBase
     private readonly ISender _sender;
     private readonly IUnitOfWork _unitOfWork;
 
-    public QuestionController(ILogger<QuestionController> logger, ISender sender, IWebHostEnvironment env,
-        IFileStorageService fileStorageService, IUnitOfWork unitOfWork)
+    public QuestionController(ILogger<QuestionController> logger, ISender sender, IUnitOfWork unitOfWork)
     {
         _logger = logger;
         _sender = sender;
-        _fileStorageService = fileStorageService;
-        _env = env;
         _unitOfWork = unitOfWork;
     }
 
@@ -54,30 +50,12 @@ public class QuestionController : ControllerBase
 
     [HttpPut("UpdateQuestion")]
     [TranslateResultToActionResult]
-    public async Task<Result<QuestionDto>> UpdateQuestion([FromForm] QuestionDto? dto, IFormFile? image)
+    public async Task<Result<QuestionDto>> UpdateQuestion([FromForm] UpdateQuestionRequestDto? dto)
     {
-        // fallback to JSON form field
-        if (dto == null && Request.HasFormContentType && Request.Form.TryGetValue("questionDto", out var json))
-            try
-            {
-                dto = JsonSerializer.Deserialize<QuestionDto>(json[0], new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-            }
-            catch (JsonException ex)
-            {
-                _logger.LogWarning(ex, "Failed to deserialize questionDto from form on update");
-            }
-
         if (dto == null)
             return Result.NotFound("Question Data cannot be null");
 
-        if (image != null)
-            dto.ImageUrl =
-                await _fileStorageService.UploadFileAsync(image.FileName, image.OpenReadStream(), "Questions");
-
-        return await _sender.Send(new UpdateQuestionCommand(dto, image));
+        return await _sender.Send(new UpdateQuestionCommand(dto));
     }
 
 

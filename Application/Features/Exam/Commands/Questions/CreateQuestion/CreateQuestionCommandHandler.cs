@@ -43,28 +43,13 @@ public class CreateQuestionCommandHandler : IRequestHandler<CreateQuestionComman
         }
 
         var question = _mapper.Map<Question>(dto);
-     
 
-
-        // foreach (var ans in question.AnswerOptions)
-        // {
-        //     ans.Question = question;
-        // }
 
         await _unitOfWork.Questions.AddAsync(question);
 
         var affected = await _unitOfWork.CompleteAsync(cancellationToken);
         _logger.LogInformation("SaveChanges affected rows: {Affected}", question);
 
-        // Verify saved answer options via repository query
-        // var savedOptions = (await _unitOfWork.AnswerOptions.FindAllAsync(a => a.QuestionId == question.Id))?.ToList();
-        // _logger.LogInformation("AnswerOptions saved for question {QuestionId}: {Count}", question.Id, savedOptions?.Count ?? 0);
-        //
-        // // Re-fetch the saved entity including AnswerOptions to ensure we return the persisted state
-        // var savedQuestion = await _unitOfWork.Questions.FindAsync(q => q.Id == question.Id, new[] { "AnswerOptions" });
-        //
-        // var resultDto = _mapper.Map<QuestionDto>(savedQuestion ?? question);
-        // return Result.Success(resultDto);
         var resultDto = _mapper.Map<QuestionDto>(question);
         return Result.Success(resultDto);
     }

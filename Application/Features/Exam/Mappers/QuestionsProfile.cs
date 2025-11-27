@@ -8,19 +8,11 @@ public class QuestionsProfile : Profile
 {
     public QuestionsProfile()
     {
-        // من الـ Request إلى الـ Entity
-        CreateMap<CreateQuestionRequestDto, Question>()
-            .ForMember(dest => dest.ImageUrl, opt => opt.Ignore())
-            .ForMember(dest => dest.AnswerOptions, opt => opt.MapFrom(src =>
-                src.AnswerOptions.Select(a => new AnswerOption
-                {
-                    Text = a.Text,
-                    IsCorrect = a.IsCorrect
-                })
-            ));
+        CreateMap<CreateQuestionRequestDto, Question>();
+        CreateMap<AnswerOptionDto, AnswerOption>();
 
-        // من الـ Entity إلى الـ Dto
         CreateMap<Question, QuestionDto>();
         CreateMap<AnswerOption, AnswerOptionDto>();
+        CreateMap<UpdateQuestionRequestDto, Question>();
     }
 }

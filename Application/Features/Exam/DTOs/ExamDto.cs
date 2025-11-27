@@ -1,8 +1,5 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using Application.Features.Students.DTOs;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace Application.Features.Exam.DTOs;
 
@@ -25,31 +22,28 @@ public class CreateQuestionRequestDto
     public decimal Points { get; set; }
     public IFormFile? Image { get; set; }
 
-    [JsonIgnore] 
     public string? ImageUrl { get; set; }
 
-    // نرسلها كسلسلة JSON
-    public string? AnswerOptionsJson { get; set; }
+    public List<AnswerOptionDto> AnswerOptions { get; set; } = new();
+}
 
-    // تتحول تلقائيًا إلى List
-    [JsonIgnore]                 // يمنع الـ JSON binding
-    [System.Text.Json.Serialization.JsonIgnore]
-    [SwaggerSchema(ReadOnly = true)]  // يمنعه من الظهور في Swagger
-    [NotMapped]
-    public List<AnswerOptionDto> AnswerOptions =>
-        string.IsNullOrEmpty(AnswerOptionsJson)
-            ? new List<AnswerOptionDto>()
-            : JsonConvert.DeserializeObject<List<AnswerOptionDto>>(AnswerOptionsJson)!;
+public class UpdateQuestionRequestDto
+{
+    public Guid Id { get; set; }
+    public string Text { get; set; } = default!;
+    public decimal Points { get; set; }
+    public IFormFile? Image { get; set; }
+
+    public string? ImageUrl { get; set; }
+
+    public List<AnswerOptionDto> AnswerOptions { get; set; } = new();
 }
 
 public class QuestionDto
 {
     public Guid Id { get; set; }
     public string Text { get; set; } = default!;
-
     public decimal Points { get; set; } = default!;
-
-    //public int Order { get; set; } = default!;
     public string? ImageUrl { get; set; }
 
 
@@ -58,7 +52,9 @@ public class QuestionDto
 
 public class AnswerOptionDto
 {
+    // [JsonIgnore] 
     public Guid Id { get; set; }
+
     public string Text { get; set; } = default!;
     public bool IsCorrect { get; set; }
 }
