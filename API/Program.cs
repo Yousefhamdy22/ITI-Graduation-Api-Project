@@ -6,6 +6,10 @@ using Application.Features.Courses.Mappers;
 using Application.Features.Exam.Mappers;
 using Core.Interfaces;
 using Core.Interfaces.Services;
+
+
+using Core.Interfaces.Services;
+
 using Infrastructure;
 using Infrastructure.Common;
 using Infrastructure.Common.GenRepo;
@@ -13,11 +17,13 @@ using Infrastructure.Data;
 using Infrastructure.Extension;
 using Infrastructure.services;
 using Infrastructure.Services;
+
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseWebRoot("wwwroot");
+//builder.WebHost.UseWebRoot("wwwroot");
 
 var connectionString = builder.Configuration.GetConnectionString("DataBase");
 
@@ -30,6 +36,7 @@ builder.Services.AddDbContext<AppDBContext>(options =>
     options.UseSqlServer(connectionString, b =>
         b.MigrationsAssembly(typeof(AppDBContext).Assembly.FullName));
 });
+
 
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -145,18 +152,11 @@ using (var scope = app.Services.CreateScope())
 #region Swagger Middleware
 
 app.UseSwagger();
-// <<<<<<< HEAD
-// app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "RepositoryPattern UnitOfWork API v1"); });
-// // app.UseExceptionHandler();
-// app.UseSwaggerUI();
-// =======
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "E-Learning API V1");
     c.RoutePrefix = "swagger"; // This makes it available at /swagger
 
-    // For production, you might want to hide the Swagger UI
-    // but keep the JSON available for API consumers
     if (!app.Environment.IsDevelopment()) c.DocumentTitle = "API Documentation - Production";
 });
 

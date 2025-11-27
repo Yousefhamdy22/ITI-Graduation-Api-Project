@@ -1,10 +1,12 @@
 using Core.Entities.Identity;
 
-public interface IRefreshTokenRepository
-{
-    Task SaveRefreshTokenAsync(Guid userId, string refreshToken, DateTime expiration);
-    Task<bool> ValidateRefreshTokenAsync(Guid userId, string refreshToken);
-    Task RevokeRefreshTokenAsync(Guid userId, string refreshToken);
+using Core.Interfaces;
 
-    public Task<RefreshToken> GetTokenAsync(string refreshToken);
-}
+
+//public interface IRefreshTokenRepository
+//{
+//    Task SaveRefreshTokenAsync(Guid userId, string refreshToken, DateTime expiration);
+//    Task<bool> ValidateRefreshTokenAsync(Guid userId, string refreshToken);
+//    Task RevokeRefreshTokenAsync(Guid userId, string refreshToken);
+//    public Task<RefreshToken> GetTokenAsync(string refreshToken);
+//}
