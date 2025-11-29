@@ -17,6 +17,7 @@ namespace Core.Entities.Identity
         public string? LastName { get; set; }
         public string? Gender { get; set; }
         public DateTime? CreatedDate { get; set; }
+        public string FullName => $"{FirstName} {LastName}";
 
         // Navigation properties
 
