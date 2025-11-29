@@ -1,5 +1,5 @@
 using Application.Features.Certificate.Command;
-using Application.Features.Certificate.DTOs;
+using Application.Features.Certificate.Query;
 using Core.Interfaces;
 using Core.Interfaces.Services;
 using MediatR;
@@ -32,7 +32,7 @@ public class CertificatesController : ControllerBase
     [HttpGet("View Certificate")]
     public async Task<IActionResult> GetMyCertificates()
     {
-        var query = new Application.Features.Certificate.Query.ViewMyCertificateQuery();
+        var query = new ViewMyCertificateQuery();
         var certificates = await _mediator.Send(query);
         return Ok(certificates);
     }
