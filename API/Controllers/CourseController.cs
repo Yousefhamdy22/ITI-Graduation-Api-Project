@@ -57,6 +57,8 @@ public class CourseController : ControllerBase
     }
 
     [HttpGet("GetAllCourses", Name = "GetAllCourses")]
+    [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false)]
+
     public async Task<IActionResult> GetAllCourses()
     {
         var query = new GetAllCoursesQuery();
