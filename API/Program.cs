@@ -22,6 +22,7 @@ using Infrastructure.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 //builder.WebHost.UseWebRoot("wwwroot");
@@ -64,11 +65,12 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddMaps(typeof(CourseProfile).Assembly);
     cfg.AddMaps(typeof(QuestionsProfile).Assembly);
 });
+
 // Replace AddOpenApi() with AddSwaggerGen and an OpenAPI document
+builder.Services.AddEndpointsApiExplorer();
 
 #region Swagger Config
 
-builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -121,23 +123,12 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddControllers();
 // builder.Services.AddResultExceptionHandler();
-builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 var app = builder.Build();
 
-app.test();
-app.UseResponseCaching();
-
-
-
-
-
-app.UseStaticFiles();
-
-
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -150,37 +141,20 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "E-Learning API V1");
-    c.RoutePrefix = "swagger"; // This makes it available at /swagger
-
-    // For production, you might want to hide the Swagger UI
-    // but keep the JSON available for API consumers
-    if (!app.Environment.IsDevelopment()) c.DocumentTitle = "API Documentation - Production";
-});
-
-#endregion
-
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    await services.SeedRolesAsync();
-}
-
-#region Swagger Middleware
-
-app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "E-Learning API V1");
-    c.RoutePrefix = "swagger"; // This makes it available at /swagger
+    c.RoutePrefix = string.Empty;//"swagger"; // This makes it available at /swagger
 
     if (!app.Environment.IsDevelopment()) c.DocumentTitle = "API Documentation - Production";
 });
 
 #endregion
+
+// Scalar API Reference Middleware
+
 
 app.UseExceptionHandler();
-
+app.test();
+app.UseResponseCaching();
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
