@@ -53,6 +53,7 @@ public class InstructorController : ControllerBase
     }
 
     [HttpGet("GetInstructors")]
+    [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false)]
     public async Task<IActionResult> GetInstructors()
     {
         var query = new GetInstructorsQuery();

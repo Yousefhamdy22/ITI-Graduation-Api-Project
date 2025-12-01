@@ -61,6 +61,8 @@ public class QuestionController : ControllerBase
 
     [HttpGet("GetAllQuestions")]
     [TranslateResultToActionResult]
+    [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false)]
+
     public async Task<Result<List<QuestionDto>>> GetAllQuestions()
     {
         return await _sender.Send(new GetAllQuestionQuery());
