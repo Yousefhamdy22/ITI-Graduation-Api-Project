@@ -2,6 +2,7 @@
 using Core.Common.Results;
 using Core.DTOs;
 using Core.Interfaces.Services;
+using Infrastructure.ZoomServices.Errors;
 using MediatR;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;

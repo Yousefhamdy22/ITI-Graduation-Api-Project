@@ -1,5 +1,4 @@
-﻿
-using Application.Features.Students.DTOs;
+﻿using Application.Features.Students.DTOs;
 using AutoMapper;
 using Core.Common.Results;
 using Core.Interfaces.Services;
@@ -37,17 +36,16 @@ namespace Application.Features.Students.Queries.Students.GetAllStudentsQuery
                 cacheKey,
                 async cancellationToken =>
                 {
-                   
+                    
+                    var studentsQuery = _repository.GetAll().AsQueryable()
+                        .Include(s => s.User)
+                        .AsNoTracking();
 
-                    var studentsResult = await _repository.GetAll().
-                       Include(s => s.User).AsNoTracking()
-                       .ToListAsync(ct);
+                    var studentsResult = await studentsQuery.ToListAsync(ct);
 
                     if (studentsResult == null)
                         return new List<StudentDto>();
 
-
-                    //return _mapper.Map<List<StudentDto>>(studentsResult);
                     return studentsResult.Select(s => new StudentDto
                     {
                         Id = s.Id,
@@ -58,7 +56,6 @@ namespace Application.Features.Students.Queries.Students.GetAllStudentsQuery
                         Email = s.User.Email!,
                         UserName = s.User.UserName!,
                         UserId = s.UserId
-
                     }).ToList();
 
                 },

@@ -2,7 +2,6 @@
 using AutoMapper;
 using Core.Common.Results;
 using Infrastructure.Interface;
-
 using MediatR;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
@@ -47,29 +46,6 @@ namespace Application.Features.Lectures.Queries.GetWithModules
 
                         return _mapper.Map<List<LectureDto>>(entities);
 
-                        //return entities.Select(l => new LectureDto
-                        //{
-                        //    Id = l.Id,
-                        //    Title = l.Title,
-                        //    IsRecordedAvailable = l.IsRecordedAvailable,
-                        //    ScheduledAt = l.ScheduledAt,
-                        //    IsCompleted = l.IsCompleted,
-                        //    ModuleId = l.ModuleId,
-                        //    CourseId = l.CourseId,
-                        //    ZoomMeeting = l.ZoomMeeting is null ? null : new ZoomMeetingDto
-                        //    {
-                        //        Id = l.ZoomMeeting.Id,
-                        //        Topic = l.ZoomMeeting.Topic,
-                        //        JoinUrl = l.ZoomMeeting.JoinUrl,
-                        //        StartTime = l.ZoomMeeting.StartTime
-                        //    },
-                        //    ZoomRecording = l.ZoomRecording is null ? null : new ZoomRecordingDto
-                        //    {
-                        //        Id = l.ZoomRecording.Id,
-                        //        RecordingUrl = l.ZoomRecording.FileUrl,
-                        //        //Duration = l.ZoomRecording.Duration
-                        //    }
-                        //}).ToList();
                     },
                     new HybridCacheEntryOptions
                     {

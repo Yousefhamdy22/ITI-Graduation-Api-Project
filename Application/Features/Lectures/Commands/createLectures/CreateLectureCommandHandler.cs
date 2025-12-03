@@ -7,7 +7,6 @@ using Core.Entities.Zoom;
 using Core.Interfaces;
 using Core.Interfaces.Services;
 using Infrastructure.Interface;
-
 using MediatR;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
@@ -23,7 +22,7 @@ namespace Application.Features.Lectures.Commands.createLectures
 
         private readonly ILectureRespository _lectureRepository;
         private readonly IZoomMeetingRepository _zoomMeetingRepository;
-        private readonly IMeetingRecordingStateService _zoomRecordingRepository;
+        //private readonly IMeetingRecordingStateService _zoomRecordingRepository;
         private readonly IZoomService _zoomService;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
@@ -33,7 +32,7 @@ namespace Application.Features.Lectures.Commands.createLectures
         public CreateLectureCommandHandler(
             ILectureRespository lectureRepository,
             IZoomMeetingRepository zoomMeetingRepository,
-            IMeetingRecordingStateService zoomRecordingRepository,
+            //IMeetingRecordingStateService zoomRecordingRepository,
             IZoomService zoomService,
             IMapper mapper,
             IUnitOfWork unitOfWork,
@@ -42,7 +41,7 @@ namespace Application.Features.Lectures.Commands.createLectures
         {
             _lectureRepository = lectureRepository;
             _zoomMeetingRepository = zoomMeetingRepository;
-            _zoomRecordingRepository = zoomRecordingRepository;
+            //_zoomRecordingRepository = zoomRecordingRepository;
             _zoomService = zoomService;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -123,7 +122,7 @@ namespace Application.Features.Lectures.Commands.createLectures
                          request.IsFree,
                          request.IsPublished
 
-                                    );
+                );
 
 
                 if (!lectureResult.IsSuccess)
@@ -134,7 +133,7 @@ namespace Application.Features.Lectures.Commands.createLectures
 
                 var lecture = lectureResult.Value;
 
-                await _lectureRepository.AddAsync(lecture, ct);
+                await _lectureRepository.AddAsync(lecture);
 
                 // 6️⃣ Commit both entities as single transaction
                 await _unitOfWork.CommitAsync(ct);

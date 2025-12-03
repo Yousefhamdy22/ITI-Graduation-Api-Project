@@ -1,13 +1,10 @@
-﻿using Application.Common.Behaviours.Interfaces;
-using Application.Features.Students.Dtos;
+﻿
 using Application.Features.Students.DTOs;
 using AutoMapper;
 using Core.Common.Results;
 using Core.Entities.Students;
 using Core.Interfaces;
 using Core.Interfaces.Services;
-using Domain.Common.Interface;
-using Domain.Common.Results;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -19,13 +16,13 @@ namespace Application.Features.Students.Queries.Students.GetStudentById
     public class GetStudentByIdQueryHandler
        : IRequestHandler<GetStudentByIdQuery, Result<StudentDto>>
     {
-        private readonly IGenericRepository<Student> _studentRepository;
+        private readonly IStudentRepository _studentRepository;
         private readonly IUserContextService _userService; 
         private readonly IMapper _mapper;
         private readonly ILogger<GetStudentByIdQueryHandler> _logger; 
 
         public GetStudentByIdQueryHandler(
-            IGenericRepository<Student> studentRepository,
+           IStudentRepository studentRepository,
             IUserContextService userService, 
             IMapper mapper,
             ILogger<GetStudentByIdQueryHandler> logger)
@@ -43,7 +40,7 @@ namespace Application.Features.Students.Queries.Students.GetStudentById
                 _logger.LogInformation("Getting student by ID: {StudentId}", request.StudentId);
 
                 // 1. Get student from repository
-                var student = await _studentRepository.GetByUserIdAsnc(request.StudentId, ct);
+                var student = await _studentRepository.GetByIdWithUserAsync(request.StudentId, ct);
                 if (student == null)
                 {
                     _logger.LogWarning("Student {StudentId} not found", request.StudentId);

@@ -21,7 +21,7 @@ namespace Application.Features.Students.Commands.Students.CreateStudent
         private readonly IUnitOfWork _unitOfWork;
         private readonly HybridCache _cache;
         private readonly ILogger<CreateStudentCommandHandler> _logger;
-        private readonly ICurrentUserService _currentUserService;
+        private readonly IUserContextService _currentUserService;
 
         public CreateStudentCommandHandler(
             IUserContextService userService,
@@ -30,7 +30,7 @@ namespace Application.Features.Students.Commands.Students.CreateStudent
             ILogger<CreateStudentCommandHandler> logger,
             IUnitOfWork unitOfWork,
             HybridCache cache,
-            ICurrentUserService currentUserService)
+            IUserContextService currentUserService)
         {
             _studentRepository = studentRepository;
             _mapper = mapper;
@@ -45,7 +45,8 @@ namespace Application.Features.Students.Commands.Students.CreateStudent
         public async Task<Result<StudentDto>> Handle(CreateStudentCommand request, CancellationToken ct)
         {
          
-            if (_currentUserService.UserId is not Guid userId)
+            var userId = _currentUserService.GetUserId();
+            if (userId == Guid.Empty)
                 return Result<StudentDto>.FromError(Error.Unauthorized("User not authenticated"));
 
 
@@ -58,7 +59,7 @@ namespace Application.Features.Students.Commands.Students.CreateStudent
             _logger.LogInformation("Creating student for user {UserId}", userId);
 
             // Check if student already exists
-            var existingStudent = await _studentRepository.GetByUserIdAsnc(userId, ct);
+            var existingStudent = await _studentRepository.GetByIdWithUserAsync(userId, ct);
             if (existingStudent != null)
                 return Result<StudentDto>.FromError(Error.Conflict("Student profile already exists"));
 
@@ -74,7 +75,7 @@ namespace Application.Features.Students.Commands.Students.CreateStudent
 
 
             var student = studentResult.Value;
-            await _studentRepository.AddAsync(student, ct);
+            await _studentRepository.AddAsync(student);
             await _unitOfWork.CommitAsync(ct);
 
             // Cache
