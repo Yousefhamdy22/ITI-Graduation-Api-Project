@@ -5,6 +5,7 @@ using AutoMapper;
 using Core.Common.Results;
 
 using Infrastructure.Interface;
+using Infrastructure.Specifications;
 using MediatR;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
@@ -47,9 +48,10 @@ namespace Application.Features.Students.Queries.Students.GetStudentCourseLecture
                     _logger.LogInformation("Cache miss - loading lectures for student {StudentId}", request.StudentId);
 
                     var spec = new EnrollmentsWithLecturesByStudentIdSpecification(request.StudentId);
+
                     var enrollments = await _enrollmentRepo.GetAllWithSpecAsync(spec, ct);
 
-                    if (enrollments == null || enrollments.Count() == 0)
+                    if (enrollments == null || !enrollments.Any())
                     {
                         _logger.LogInformation("No enrollments found for student {StudentId}", request.StudentId);
                         return new List<StudentCourseLecturesDto>();

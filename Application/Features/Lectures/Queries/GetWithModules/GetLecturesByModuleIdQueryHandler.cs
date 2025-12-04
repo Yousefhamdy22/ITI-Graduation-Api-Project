@@ -2,6 +2,7 @@
 using AutoMapper;
 using Core.Common.Results;
 using Infrastructure.Interface;
+using Infrastructure.Specifications;
 using MediatR;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
@@ -42,7 +43,7 @@ namespace Application.Features.Lectures.Queries.GetWithModules
                         _logger.LogInformation("Cache miss - loading lectures for module {ModuleId}", request.ModuleId);
 
                         var spec = new LecturesByModuleIdSpecification(request.ModuleId);
-                        var entities = await _lectureRepository.GetAllWithSpecAsync(spec, ct);
+                        var entities = _lectureRepository.GetAllWithSpecAsync(spec);
 
                         return _mapper.Map<List<LectureDto>>(entities);
 

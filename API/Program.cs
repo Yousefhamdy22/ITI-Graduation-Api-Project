@@ -27,6 +27,7 @@ var connectionString = builder.Configuration.GetConnectionString("DataBase");
 builder.Services.AddInfrastructureDependencies().AddServiceDependencies()
     .AddServiceRegisteration(builder.Configuration);
 
+
 builder.Services.AddDbContext<AppDBContext>(options =>
 {
     options.UseSqlServer(connectionString, b => b.MigrationsAssembly(typeof(AppDBContext).Assembly.FullName));

@@ -27,12 +27,28 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         return await _context.Set<T>().ToListAsync();
     }
 
-    public async Task GetAllWithSpecAsync(ISpecification<T> spec, CancellationToken ct = default)
+
+    public async Task<IEnumerable<T>> GetAllWithSpecAsync(ISpecification<T> spec, CancellationToken ct)
     {
-        var queryableResultWithIncludes = SpecificationEvaluter<T>.GetQuery(_context.Set<T>().AsQueryable(), spec);
-        await queryableResultWithIncludes.ToListAsync(ct);
+        var query = ApplySpeification(spec);
+        return await query.ToListAsync(ct);
     }
 
+    public async Task<T> GetByIdWithSpecAsync(ISpecification<T> spec, CancellationToken ct)
+    {
+        var query = ApplySpeification(spec);
+        return await query.FirstOrDefaultAsync(ct);
+    }
+
+    private IQueryable<T> ApplySpeification(ISpecification<T> spec)
+    {
+        return SpecificationEvaluter<T>.GetQuery(_dbSet.AsQueryable(), spec);
+    }
+    public IQueryable<T> GetAsNoTracking(CancellationToken ct)
+    {
+        return _dbSet.AsNoTracking();
+    }
+   
     public T GetById(int id)
     {
         return _context.Set<T>().Find(id);

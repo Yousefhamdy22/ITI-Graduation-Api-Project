@@ -10,8 +10,8 @@ public interface IGenericRepository<T> where T : class
 
     IEnumerable<T> GetAll();
     Task<IEnumerable<T>> GetAllAsync();
-
-    Task GetAllWithSpecAsync(ISpecification<T> spec, CancellationToken ct = default);
+    IQueryable<T> GetAsNoTracking(CancellationToken ct);
+    Task<IEnumerable<T>> GetAllWithSpecAsync(ISpecification<T> spec, CancellationToken ct = default);
     T Find(Expression<Func<T, bool>> criteria, string[] includes = null);
     Task<T> FindAsync(Expression<Func<T, bool>> criteria, string[] includes = null);
     IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, string[] includes = null);
