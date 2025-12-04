@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Core.Common.Specifications;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,12 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     public async Task<IEnumerable<T>> GetAllAsync()
     {
         return await _context.Set<T>().ToListAsync();
+    }
+
+    public async Task GetAllWithSpecAsync(ISpecification<T> spec, CancellationToken ct = default)
+    {
+        var queryableResultWithIncludes = SpecificationEvaluter<T>.GetQuery(_context.Set<T>().AsQueryable(), spec);
+        await queryableResultWithIncludes.ToListAsync(ct);
     }
 
     public T GetById(int id)

@@ -1,4 +1,5 @@
-﻿using Infrastructure.ZoomServices.Dtos;
+﻿
+using Application.Common.Dtos;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;

@@ -1,6 +1,4 @@
 ﻿using Core.Entities.Exams;
-using Domain.Common.Interface;
-using Domain.Entities.Exams;
 using Infrastructure.Common.GenRepo;
 using Infrastructure.Data;
 using Infrastructure.Interface;
