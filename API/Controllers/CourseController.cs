@@ -4,6 +4,10 @@ using Application.Features.Courses.Commands.UpdateCourse;
 using Application.Features.Courses.DTOs;
 using Application.Features.Courses.Queries.GetAllCourses;
 using Application.Features.Courses.Queries.GetCourseByIdQuery;
+using Application.Features.Lectures.Commands.createLectures;
+using Application.Features.Lectures.Dtos;
+using Application.Features.Modules.Commands.CreateModules;
+using Application.Features.Modules.Dtos;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -38,6 +42,58 @@ public class CourseController : ControllerBase
         var result = await _mediator.Send(command);
         return Ok(result);
     }
+
+    [HttpPost("{courseId}/modules/{moduleId}/lectures")]
+    public async Task<IActionResult> CreateLecture(
+               Guid courseId,
+               Guid moduleId,
+               [FromBody] CreateLectureDto dto,
+               CancellationToken ct)
+    {
+        var command = new CreateLectureCommand(
+            dto.Title,
+            dto.ScheduledAt,
+            TimeSpan.FromMinutes(60),
+            moduleId,
+            Guid.Empty,               // ZoomMeetingId (placeholder)
+            Guid.Empty               // ZoomRecoredId (placeholder)
+          
+
+        );
+
+        var result = await _mediator.Send(command, ct);
+
+        if (!result.IsSuccess)
+            return BadRequest(result.TopError.Description);
+
+        return Ok(result.Value);
+    }
+
+    [HttpPost("{courseId}/modules")]
+    public async Task<IActionResult> CreateModule(
+                      Guid courseId,
+                      [FromBody] CreateModuleDto dto,
+
+                      CancellationToken ct)
+    {
+        var command = new CreateModuleCommand(
+            dto.Title,
+            dto.Description,
+            courseId
+        );
+
+        var result = await _mediator.Send(command, ct);
+
+        if (result.IsError)
+            return BadRequest(result.Errors);
+
+        return Ok(result.Value);
+    }
+
+
+
+
+
 
     [HttpPost("Update/{id:guid}", Name = "UpdateCourse")]
     public async Task<IActionResult> UpdateCourse(Guid id, [FromBody] CourseDto.UpdateCourseDto dto)

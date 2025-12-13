@@ -30,6 +30,7 @@ public static class ModuleInfrastructureDependencies
         services.AddScoped<IStudentAnswerRepository, StudentAnswerRepository>();
 
         services.AddScoped<ICourseRepository, CourseRepository>();
+        services.AddScoped<IModuleRepository, ModuleRepository>();
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
         services.AddScoped<ILectureRespository, LectureRespository>();
 

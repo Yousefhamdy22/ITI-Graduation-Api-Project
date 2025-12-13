@@ -21,7 +21,14 @@ namespace Application.Features.Lectures.Dtos
         public ZoomMeetingDto? ZoomMeeting { get; set; }
         public ZoomRecordingDto? ZoomRecording { get; set; }
     }
-
+    public class ResponseLecture
+    {
+        public Guid LectureId { get; set; }
+        public string Title { get; set; }
+        public DateTimeOffset ScheduledAt { get; set; }
+        public TimeSpan Duration { get; set; }
+        public ZoomMeetingDto ZoomMeeting { get; set; }
+    }
     public class CreateLectureDto
     {
         public Guid Id { get; set; }
